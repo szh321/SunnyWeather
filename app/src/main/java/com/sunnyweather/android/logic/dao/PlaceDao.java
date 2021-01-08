@@ -9,7 +9,7 @@ import com.sunnyweather.android.logic.model.Place;
 
 public  class PlaceDao {
    public   static void savePlace(Place place) {
-          sharedPreferences().edit().putString("place",new  Gson().toJson(place));
+          sharedPreferences().edit().putString("place",new  Gson().toJson(place)).commit();
       }
        public   static Place getSavedPlace () {
               String placeJson = sharedPreferences().getString("place", "");

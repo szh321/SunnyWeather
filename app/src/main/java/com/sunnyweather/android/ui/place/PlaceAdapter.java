@@ -7,7 +7,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.sunnyweather.android.R;
@@ -30,16 +31,27 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> 
     public ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.place_item, parent, false);
          ViewHolder viewHolder = new ViewHolder(view);
+
         viewHolder.itemView.setOnClickListener(v -> {
             int adapterPosition = viewHolder.getAdapterPosition();
             Place place = placeList.get(adapterPosition);
-            Intent intent = new Intent(parent.getContext(), WeatherActivity.class);
-            intent.putExtra("location_lng", place.getLocation().getLng());
-            intent.putExtra("location_lat", place.getLocation().getLat());
-            intent.putExtra("place_name", place.getName());
+            FragmentActivity acticity=fragment.getActivity();
+            if (acticity instanceof WeatherActivity){
+                DrawerLayout drawerLayout=acticity.findViewById(R.id.drawerLayout);
+                drawerLayout.closeDrawers();
+                ((WeatherActivity) acticity).getViewModel().setLocationLng(place.getLocation().getLng());
+                ((WeatherActivity) acticity).getViewModel().setLocationLat(place.getLocation().getLat());
+                ((WeatherActivity) acticity).getViewModel().setPlaceName(place.getName());
+                ((WeatherActivity) acticity).refreshWeather();
+            }else {
+                Intent intent = new Intent(parent.getContext(), WeatherActivity.class);
+                intent.putExtra("location_lng", place.getLocation().getLng());
+                intent.putExtra("location_lat", place.getLocation().getLat());
+                intent.putExtra("place_name", place.getName());
+                fragment.startActivity(intent);
+                fragment.getActivity().finish();//自己谁便加的
+            }
             fragment.getViewModel().savePlace(place);
-            fragment.startActivity(intent);
-            fragment.getActivity().finish();//自己谁便加的
         });
         return viewHolder;
 
